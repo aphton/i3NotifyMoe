@@ -23,15 +23,17 @@ func (nm *notifyMoe) FetchCurrentlyWatchingAndAiringAnimes() ([]config.StateItem
 		return nil, errors.New("Environment var '" + config.EnvUsername + "' not set!")
 	}
 
-	user, err := nickToUser(nm.configSvc.GetConfiguration())
+	data, err := get(APIEndpointNickToUser+nm.configSvc.GetConfiguration().Username, &User{})
 	if err != nil {
 		return nil, err
 	}
+	user := data.(*User)
 
-	animelist, err := animelistOfUser(user)
+	data, err = get(APIEndpointAnimeList+user.UserID, &Animelist{})
 	if err != nil {
 		return nil, err
 	}
+	animelist := data.(*Animelist)
 
 	var watchingAnimes []AnimelistItem
 	for _, item := range animelist.Items {
@@ -60,7 +62,12 @@ func (nm *notifyMoe) FetchCurrentlyWatchingAndAiringAnimes() ([]config.StateItem
 		}
 
 		idNextEpisode := animeWithEpisode.Anime.Episodes[animeWithEpisode.CurEpisode]
-		episode, err := episdeByID(idNextEpisode)
+		data, err := get(APIEndpointEpisode+idNextEpisode, &Episode{})
+		if err != nil {
+			return nil, err
+		}
+		episode := data.(*Episode)
+
 		if err != nil {
 			continue
 		}
@@ -75,7 +82,7 @@ func (nm *notifyMoe) FetchCurrentlyWatchingAndAiringAnimes() ([]config.StateItem
 	return result, nil
 }
 
-func get(endPoint string) (*string, error) {
+func get(endPoint string, dataType interface{}) (interface{}, error) {
 	resp, err := http.Get(endPoint)
 	if err != nil {
 		return nil, err
@@ -83,57 +90,25 @@ func get(endPoint string) (*string, error) {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	b := string(body)
-	return &b, err
-}
-
-func nickToUser(cfg *config.Configuration) (*User, error) {
-	body, err := get(APIEndpointNickToUser + cfg.Username)
 	if err != nil {
 		return nil, err
 	}
-
-	var user User
-	err = json.Unmarshal([]byte(*body), &user)
-	return &user, err
-}
-
-func animelistOfUser(user *User) (*Animelist, error) {
-	body, err := get(APIEndpointAnimeList + user.UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	var animelist Animelist
-	err = json.Unmarshal([]byte(*body), &animelist)
-	return &animelist, err
-}
-
-func episdeByID(episodeID string) (*Episode, error) {
-	body, err := get(APIEndpointEpisode + episodeID)
-	if err != nil {
-		return nil, err
-	}
-
-	var episode Episode
-	err = json.Unmarshal([]byte(*body), &episode)
-	return &episode, err
+	err = json.Unmarshal(body, &dataType)
+	return dataType, err
 }
 
 func animeByListItem(item *AnimelistItem, wg *sync.WaitGroup, animes chan *AnimeWithEpisode) {
 	defer wg.Done()
 
-	body, err := get(APIEndpointAnime + item.AnimeID)
+	data, err := get(APIEndpointAnime+item.AnimeID, &Anime{})
 	if err != nil {
 		return
 	}
 
-	animeWithEpisode := AnimeWithEpisode{}
-	err = json.Unmarshal([]byte(*body), &animeWithEpisode.Anime)
-	if err != nil {
-		return
+	animeWithEpisode := AnimeWithEpisode{
+		CurEpisode: item.Episodes,
+		Anime:      *data.(*Anime),
 	}
-	animeWithEpisode.CurEpisode = item.Episodes
 
 	animes <- &animeWithEpisode
 }
