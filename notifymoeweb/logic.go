@@ -10,7 +10,7 @@ import (
 	"github.com/Aphton/i3NotifyMoe/config"
 )
 
-// NewNotifyMoeService asd
+// NewNotifyMoeService creates a new NotifyMoeService
 func NewNotifyMoeService(configSvc config.ConfigurationService) NotifyMoeService {
 	return &notifyMoe{
 		configSvc: configSvc,

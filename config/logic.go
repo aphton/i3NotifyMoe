@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-// NewConfigurationService bla
+// NewConfigurationService creates a new ConfigurationService
 func NewConfigurationService() ConfigurationService {
-	var ctx context
-	ctx.config = loadConfig()
-	return &ctx
+	return &context{
+		config: loadConfig(),
+	}
 }
 
-// LoadPersistedState loads a peristate state from StateFilename
+// LoadPersistedState loads state from the reader (file)
 func (ctx *context) LoadPersistedState(reader io.Reader) error {
 	b, err := ioutil.ReadAll(reader)
 	if err != nil {
@@ -36,8 +36,11 @@ func (ctx *context) LoadPersistedState(reader io.Reader) error {
 	return ctx.SetStateItems(stateItems)
 }
 
-// PersistState sorts states and then persists them
+// PersistState sorts the lists in ctx.state and then persists them
 func (ctx *context) PersistState(writer io.Writer) error {
+	if err := sortState(ctx); err != nil {
+		return err
+	}
 	var out bytes.Buffer
 	for _, r := range ctx.state.ReleasedAnimes {
 		out.WriteString(r.String())

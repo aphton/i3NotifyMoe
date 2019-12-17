@@ -9,5 +9,5 @@ const BlockButton = "BLOCK_BUTTON"
 // BlockButtonRightClick is the value for right click
 const BlockButtonRightClick = "3"
 
-// StateFilename filename used to store state
+// StateFilename is where the state is peristed at (released, today, unreleased)
 const StateFilename = "state"

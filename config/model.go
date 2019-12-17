@@ -39,7 +39,12 @@ func (cfg Configuration) IsRightButtonClicked() bool {
 	return cfg.BlockButton == BlockButtonRightClick
 }
 
-// FromString converts a formatted StateItem string back (deserialization)
+// String() serializes the StateItem to a string
+func (si StateItem) String() string {
+	return fmt.Sprintf("%s;%d;%s", si.Title, si.Episode, si.DateTime)
+}
+
+// FromString deserializes a StateItem string
 func (si *StateItem) FromString(str string) error {
 	items := strings.Split(str, ";")
 	if len(items) != 3 {
@@ -54,22 +59,24 @@ func (si *StateItem) FromString(str string) error {
 	return nil
 }
 
-// DatetimeToDate converts datetime string to a timezone conscious datetime object and extracts the date
-func (si StateItem) DatetimeToDate(location *time.Location) string {
-	datetime, _ := time.Parse(time.RFC3339, si.DateTime)
+// DatetimeToDate converts datetime string to a timezone aware datetime object and extracts the date
+func (si StateItem) DatetimeToDate(location *time.Location) (string, error) {
+	datetime, err := time.Parse(time.RFC3339, si.DateTime)
+	if err != nil {
+		return "", err
+	}
 	datetime = datetime.In(location)
-	return datetime.Format("2006-01-02")
+	return datetime.Format("2006-01-02"), nil
 }
 
-// DatetimeToTime converts datetime string to a timezone conscious datetime object and extracts the time
-func (si StateItem) DatetimeToTime(location *time.Location) string {
-	datetime, _ := time.Parse(time.RFC3339, si.DateTime)
+// DatetimeToTime converts datetime string to a timezone aware datetime object and extracts the time
+func (si StateItem) DatetimeToTime(location *time.Location) (string, error) {
+	datetime, err := time.Parse(time.RFC3339, si.DateTime)
+	if err != nil {
+		return "", err
+	}
 	datetime = datetime.In(location)
-	return datetime.Format("15:04:05")
-}
-
-func (si StateItem) String() string {
-	return fmt.Sprintf("%s;%d;%s", si.Title, si.Episode, si.DateTime)
+	return datetime.Format("15:04:05"), nil
 }
 
 func (s *State) String() string {

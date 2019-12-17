@@ -2,17 +2,18 @@
 An i3blocks taskbar integration for notify.moe!
 
 ## What does it do?
-This little tool goes to notify.moe/api and fetches curently airing & watching animes for the user (env variable "I3_NOTIFY_MOE_USERNAME").
+This little tool goes to notify.moe/api and fetches curently airing & watching animes
+for the user (set in environment variable "I3_NOTIFY_MOE_USERNAME").
 
-It then categorizes the result into these 3 lists:
+It then splits the list into these 3 categories:
 - released - contains episodes that have already aired
 - today - contains episodes that will air today, but haven't yet
 - unreleased - contains episodes which air tomorrow or later
 
-It then outputs something like "1/3" into stdout, which indicates that there is 1 episode ready to be consumed today!
+And then it outputs something like "1/3" into stdout, which indicates that there is 1 episode ready to be consumed!
 
 The tool is configured to run once when i3blocks starts and every time you do a left-click on it in the taskbar!
-Right click will pop up a desktop notification showing you those 3 lists in a neatly formatted way!
+Right click will pop up a desktop notification showing you those 3 lists in a nicely formatted way!
 
 ## Screenshots
 Taskbar

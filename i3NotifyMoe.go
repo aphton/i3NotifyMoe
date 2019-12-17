@@ -27,10 +27,18 @@ func loadAndNotify(configSvc config.ConfigurationService, notifySvc desktopnotif
 		released = append(released, fmt.Sprintf("%s - %d", r.Title, r.Episode))
 	}
 	for _, t := range configSvc.GetState().TodayAnimes {
-		today = append(today, fmt.Sprintf("%s %s - %d", t.DatetimeToTime(loc), t.Title, t.Episode))
+		timeStr, err := t.DatetimeToTime(loc)
+		if err != nil {
+			return err
+		}
+		today = append(today, fmt.Sprintf("%s %s - %d", timeStr, t.Title, t.Episode))
 	}
 	for _, u := range configSvc.GetState().UnreleasedAnimes {
-		unreleased = append(unreleased, fmt.Sprintf("%s %s - %d", u.DatetimeToDate(loc), u.Title, u.Episode))
+		dateStr, err := u.DatetimeToDate(loc)
+		if err != nil {
+			return err
+		}
+		unreleased = append(unreleased, fmt.Sprintf("%s %s - %d", dateStr, u.Title, u.Episode))
 	}
 	if err := notifySvc.NotifySend(released, today, unreleased); err != nil {
 		return err
