@@ -37,5 +37,6 @@ Just paste this into your i3blocks config file (locate in i.e. /etc/i3blocks.con
     [anime]
     command=<path to executable>
     I3_NOTIFY_MOE_USERNAME=<your username on notify.moe (case sensitive!)>
+    label= 
     markup=pango
     interval=once
