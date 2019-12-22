@@ -80,7 +80,7 @@ func (si StateItem) DatetimeToTime(location *time.Location) (string, error) {
 }
 
 func (s *State) String() string {
-	return fmt.Sprintf("\uf008 %d/%d",
+	return fmt.Sprintf("%d/%d",
 		len(s.ReleasedAnimes)+len(s.TodayAnimes),
 		len(s.ReleasedAnimes)+len(s.TodayAnimes)+len(s.UnreleasedAnimes))
 }
