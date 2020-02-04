@@ -29,7 +29,7 @@ Notification
 Two commands to execute:
 
     go get github.com/go-floki/jade
-    go install i3NotifyMoe
+    go build
     
 ## How to configure i3blocks?
 Just paste this into your i3blocks config file (locate in i.e. /etc/i3blocks.conf)
